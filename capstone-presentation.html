@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoadBrief AI - Capstone Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #1f2937;
+            overflow: hidden;
+        }
+
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 90vw;
+            max-width: 1200px;
+            height: 85vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 80px;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Slide Navigation */
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            font-size: 16px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .nav-buttons {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-buttons button {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        .nav-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            color: #1e3a8a;
+        }
+
+        h2 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #1e3a8a;
+        }
+
+        h3 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #3b82f6;
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: #6b7280;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .author {
+            font-size: 22px;
+            color: #9ca3af;
+            margin-top: 40px;
+        }
+
+        /* Content Styles */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .bullet-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .bullet-list li {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            padding-left: 40px;
+            position: relative;
+            color: #374151;
+        }
+
+        .bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 12px;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+        }
+
+        .bullet-list .emoji {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+
+        /* Split Layout */
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .split-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .before-box {
+            background: #fef3c7;
+            border: 2px dashed #f59e0b;
+            padding: 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #92400e;
+            font-family: monospace;
+        }
+
+        .after-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .after-box .check-item {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #065f46;
+        }
+
+        .after-box .check-item::before {
+            content: '✓';
+            color: #10b981;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        .stat-desc {
+            font-size: 14px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        /* Timeline */
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-dot {
+            width: 80px;
+            height: 80px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            font-weight: 800;
+            color: white;
+            border: 6px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .timeline-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        /* Roadmap */
+        .roadmap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .phase {
+            background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 6px solid #3b82f6;
+            padding: 14px 20px;
+            border-radius: 12px;
+        }
+
+        .phase-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 6px;
+        }
+
+        .phase-items {
+            font-size: 14px;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #dbeafe;
+            border: 3px solid #3b82f6;
+            padding: 24px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .highlight-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
+        }
+
+        /* QR Code Placeholder */
+        .qr-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+        }
+
+        .qr-box {
+            width: 200px;
+            height: 200px;
+            background: white;
+            border: 4px solid #3b82f6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .link-text {
+            font-size: 20px;
+            color: #3b82f6;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        /* Target Users */
+        .target-users {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .user-tag {
+            background: #f3f4f6;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 16px;
+            color: #374151;
+            font-weight: 600;
+        }
+
+        /* Criteria Grid */
+        .criteria-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .criteria-item {
+            background: #f9fafb;
+            padding: 16px;
+            border-radius: 8px;
+            border-left: 4px solid #10b981;
+            font-size: 16px;
+            color: #374151;
+        }
+
+        .score {
+            float: right;
+            font-weight: 700;
+            color: #10b981;
+        }
+
+        /* Key Message Box */
+        .key-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .key-message-title {
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .key-message-text {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px;
+            }
+
+            h1 {
+                font-size: 40px;
+            }
+
+            h2 {
+                font-size: 32px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .split {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .timeline::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation">
+        <!-- SLIDE 1: TITLE -->
+        <div class="slide active" data-slide="1">
+            <div class="content" style="text-align: center; justify-content: center;">
+                <h1>RoadBrief AI</h1>
+                <div class="subtitle">Transforming messy voice memos into structured client insights</div>
+                <div class="author">Richard Poplawski<br>Capstone Project • January 2026</div>
+            </div>
+            <div class="slide-number">1 / 7</div>
+        </div>
+
+        <!-- SLIDE 2: THE PROBLEM -->
+        <div class="slide" data-slide="2">
+            <h2>The Problem: The Post-Meeting Window</h2>
+            <div class="content">
+                <div class="highlight-box">
+                    <div class="highlight-text">The Critical Moment: Right after the meeting → Details are fresh, but attention is low</div>
+                </div>
+                <ul class="bullet-list">
+                    <li><span class="emoji">🎤</span><strong>Can't take notes during meetings</strong> — Presenting, facilitating, fully engaged</li>
+                    <li><span class="emoji">🚗</span><strong>Need to capture context immediately after</strong> — Mobile, mentally fatigued, but details still fresh</li>
+                    <li><span class="emoji">📱</span><strong>Existing tools fail at this moment</strong> — CRMs require structure • Note apps need typing</li>
+                    <li><span class="emoji">⏰</span><strong>The window closes fast</strong> — Delay = Lost details, forgotten context, missed follow-ups</li>
+                </ul>
+                <div class="key-message" style="margin-top: 20px; padding: 20px;">
+                    <div class="key-message-title">Core Insight</div>
+                    <div class="key-message-text" style="font-size: 20px;">Sales reps need to offload working memory immediately after meetings—when recall is high but attention is low</div>
+                </div>
+            </div>
+            <div class="slide-number">2 / 7</div>
+        </div>
+
+        <!-- SLIDE 3: THE SOLUTION -->
+        <div class="slide" data-slide="3">
+            <h2>The Solution: Voice-First Relationship Memory Assistant</h2>
+            <div class="content">
+                <div class="split">
+                    <div class="split-column">
+                        <h3>BEFORE</h3>
+                        <div class="before-box">
+"Just met with Ryan and Sheila from HarborPoint, building C got bigger so budget is higher, Ryan wants revised quote by unit type, Sheila wants more textured plank for corridors, carpet lead time discussion, need to confirm by Thursday, Sheila's daughter just got into Stanford..."
+                        </div>
+                    </div>
+                    <div class="split-column">
+                        <h3>AFTER: Structured Intelligence</h3>
+                        <div class="after-box">
+                            <div class="check-item">People & Project (organized)</div>
+                            <div class="check-item">Meeting Summary (scannable)</div>
+                            <div class="check-item">Requirements (clear)</div>
+                            <div class="check-item">Follow-Up Tasks (with dates)</div>
+                            <div class="check-item">Personal Details (separate)<br>→ "Daughter got into Stanford"</div>
+                            <div class="check-item">Clarification Questions (smart)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <div class="highlight-text">Cognitive Safety Net: Offloads memory → Structures context → Enables relationship intelligence</div>
+                </div>
+            </div>
+            <div class="slide-number">3 / 7</div>
+        </div>
+
+        <!-- SLIDE 4: PROMPT ENGINEERING JOURNEY -->
+        <div class="slide" data-slide="4">
+            <h2>Building Production-Quality AI: 23 Iterations</h2>
+            <div class="content">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">V1</div>
+                        <div class="timeline-label">Basic Structure</div>
+                        <div class="timeline-desc">~200 words<br>Simple instructions</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">V17</div>
+                        <div class="timeline-label">Systematic Testing</div>
+                        <div class="timeline-desc">45 test cases<br>Rigorous evaluation</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">V23</div>
+                        <div class="timeline-label">Production-Ready</div>
+                        <div class="timeline-desc">~800 words (4x detail)<br>100% pass rate</div>
+                    </div>
+                </div>
+                <ul class="bullet-list" style="margin-top: 40px;">
+                    <li><strong>V1-5:</strong> Core structure + basic rules</li>
+                    <li><strong>V6-16:</strong> Added gating, routing, task extraction</li>
+                    <li><strong>V17:</strong> Started systematic 45-case evaluation</li>
+                    <li><strong>V17-23:</strong> Optimized based on failure patterns</li>
+                </ul>
+                <div class="highlight-box">
+                    <div class="highlight-text">Result: 23 iterations → 100% accuracy on critical criteria</div>
+                </div>
+            </div>
+            <div class="slide-number">4 / 7</div>
+        </div>
+
+        <!-- SLIDE 5: EVALUATION METHODOLOGY -->
+        <div class="slide" data-slide="5">
+            <h2>Rigorous Testing: 10-Criteria Evaluation Rubric</h2>
+            <div class="content">
+                <div class="split">
+                    <div class="split-column">
+                        <h3>The Test Set</h3>
+                        <div style="background: #f9fafb; padding: 20px; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                            <div style="font-size: 32px; font-weight: 800; color: #3b82f6; margin-bottom: 10px;">45 Test Cases</div>
+                            <div style="font-size: 16px; line-height: 1.8; color: #374151;">
+                                <strong>Started with:</strong><br>
+                                • 3 real meeting transcripts<br>
+                                (wife's sales meetings)<br><br>
+                                <strong>Generated with AI:</strong><br>
+                                • 42 edge case scenarios<br>
+                                • Missing information<br>
+                                • Ambiguous dates<br>
+                                • Implicit tasks<br>
+                                • Mixed contexts
+                            </div>
+                        </div>
+                    </div>
+                    <div class="split-column">
+                        <h3>Scoring Criteria (0-1-2 scale)</h3>
+                        <div class="criteria-grid">
+                            <div class="criteria-item">Structure Compliance <span class="score">91%</span></div>
+                            <div class="criteria-item">Gate Behavior <span class="score">93%</span></div>
+                            <div class="criteria-item">Entity Extraction <span class="score">100% ⭐</span></div>
+                            <div class="criteria-item">Summary Quality <span class="score">98%</span></div>
+                            <div class="criteria-item">Information Routing <span class="score">100% ⭐</span></div>
+                            <div class="criteria-item">Task Extraction <span class="score">98%</span></div>
+                            <div class="criteria-item">Clarification Behavior <span class="score">98%</span></div>
+                            <div class="criteria-item">Hallucination Resistance <span class="score">100% ⭐</span></div>
+                            <div class="criteria-item">Tone <span class="score">100% ⭐</span></div>
+                            <div class="criteria-item">Empty Section Handling <span class="score">96%</span></div>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 20px;">
+                            <div class="highlight-text">Overall: 100% Pass Rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">5 / 7</div>
+        </div>
+
+        <!-- SLIDE 6: RESULTS & IMPACT -->
+        <div class="slide" data-slide="6">
+            <h2>Results: Production-Ready AI Tool</h2>
+            <div class="content">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">23</div>
+                        <div class="stat-label">Iterations</div>
+                        <div class="stat-desc">Systematic optimization</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Pass Rate ⭐</div>
+                        <div class="stat-desc">All 45 cases</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Critical Criteria</div>
+                        <div class="stat-desc">Zero hallucinations</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <div class="highlight-text">🚀 PRODUCTION-READY PROTOTYPE DEPLOYED</div>
+                    <div style="margin-top: 15px; font-size: 18px; color: #1e3a8a;">https://rpop11.github.io/sales-meeting-debrief-prototype/</div>
+                </div>
+                <h3 style="text-align: center; margin-top: 30px; margin-bottom: 20px;">Target Users: Client-Facing Professionals</h3>
+                <div class="target-users">
+                    <div class="user-tag">👔 Sales Reps</div>
+                    <div class="user-tag">🏗️ Manufacturers' Reps</div>
+                    <div class="user-tag">🏠 Real Estate Agents</div>
+                    <div class="user-tag">💼 Financial Advisors</div>
+                    <div class="user-tag">🤝 Customer Success</div>
+                    <div class="user-tag">📊 Recruiters</div>
+                </div>
+                <div class="key-message">
+                    <div class="key-message-title">What This Means</div>
+                    <div class="key-message-text" style="font-size: 18px; line-height: 1.6;">
+                        Cognitive safety net — Never forgets, never misattributes<br>
+                        More time for relationships, less for documentation
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">6 / 7</div>
+        </div>
+
+        <!-- SLIDE 7: NEXT STEPS -->
+        <div class="slide" data-slide="7">
+            <h2>Next Steps: From Prototype to Product</h2>
+            <div class="content">
+                <div class="roadmap">
+                    <div class="phase">
+                        <div class="phase-title">📱 PHASE 1: Finish Product for Beta (Weeks 1-2)</div>
+                        <div class="phase-items">• Add frontend for recording & uploading audio<br>• Integrate Whisper (speech-to-text)<br>• Build save and export functionality</div>
+                    </div>
+                    <div class="phase">
+                        <div class="phase-title">🧪 PHASE 2: Beta Test (Weeks 3-4)</div>
+                        <div class="phase-items">• 1-3 sales professionals<br>• Real-world validation<br>• Collect feedback and edge cases</div>
+                    </div>
+                    <div class="phase">
+                        <div class="phase-title">🤖 PHASE 3: Core Features (Months 2-3)</div>
+                        <div class="phase-items">• In-app voice recording<br>• Reminder generation for action items (calendar, email, notification)<br>• Automated evaluation pipeline</div>
+                    </div>
+                    <div class="phase">
+                        <div class="phase-title">🧠 PHASE 4: Intelligent Features (Months 4-6)</div>
+                        <div class="phase-items">• Memory across meetings (RAG)<br>• Pre-meeting briefs: "Here's what you discussed last time"<br>• Proactive reminders: "Follow up on X"<br>• Personal detail surfacing: "Ask about their vacation"</div>
+                    </div>
+                </div>
+                <div class="key-message" style="margin-top: 20px; padding: 20px;">
+                    <div class="key-message-title" style="margin-bottom: 8px;">Vision</div>
+                    <div class="key-message-text" style="font-size: 22px;">Sales reps never forget a client detail again</div>
+                </div>
+                <div class="qr-section" style="margin-top: 15px;">
+                    <div class="qr-box">
+                        [QR Code Here]<br>
+                        Generate at qr-code-generator.com
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 18px; font-weight: 700; color: #1e3a8a; margin-bottom: 10px;">🔗 Try the Prototype</div>
+                        <div class="link-text" style="font-size: 16px;">rpop11.github.io/sales-meeting-debrief-prototype/</div>
+                        <div style="margin-top: 20px; font-size: 16px; color: #6b7280;">
+                            📧 rich.pope@example.com<br>
+                            💼 linkedin.com/in/richpope
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">7 / 7</div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav-buttons">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+        }
+
+        function changeSlide(n) {
+            currentSlide += n;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Initialize
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
